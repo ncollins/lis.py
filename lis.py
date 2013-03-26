@@ -77,15 +77,17 @@ def lookup(name, env):
     raise Exception('unknown variable "{}"'.format(name))
 
 variadic_functions = {'+': sum,
-                      '*': lambda li: reduce(operator.mul, li),
-                      '-': lambda li: reduce(operator.sub, li),
-                      '/': lambda li: reduce(operator.div, li),
-                      'list': lambda li: li,
-                     }
-
-lazy_functions = {'and': lambda li: all(p for p in li),
-                  'or':  lambda li: any(p for p in li),
-                 }
+                      '*': lambda gen: reduce(operator.mul, gen),
+                      '-': lambda gen: reduce(operator.sub, gen),
+                      '/': lambda gen: reduce(operator.div, gen),
+                      'list': lambda gen: list(gen),
+                      'and': lambda gen: all(p for p in gen),
+                      'or':  lambda gen: any(p for p in gen),
+                      'cons': lambda (x, y): [x] + y,
+                      'car': lambda gen: gen.next()[0],
+                      'cdr': lambda gen: gen.next()[1:],
+                      'null?': lambda gen: gen.next() == [],
+                    }
 
 binary_functions = {'<': operator.lt,
                     '>': operator.gt,
@@ -93,13 +95,7 @@ binary_functions = {'<': operator.lt,
                     '>=': operator.ge,
                     '<=': operator.le,
                     # todo: extend tests to cover le and ge
-                    'cons': lambda x, y: [x] + y,
-                    }
-
-unary_functions = {'car': lambda li: li[0],
-                   'cdr': lambda li: li[1:],
-                   'null?': lambda x: x == [],
-                  }
+                   }
 
 def eval_in_env(exp, env):
     if exp == 'null':
@@ -111,21 +107,14 @@ def eval_in_env(exp, env):
     # FUNCTIONS
     rator, rands = exp[0], exp[1:]
     if not isinstance(rator, list):
-        for funcmap in [variadic_functions, lazy_functions, 
-                         binary_functions, unary_functions ]:
+        for funcmap in [variadic_functions, binary_functions]:
             if rator in funcmap:
                 gen_params = (eval_in_env(rand, env) for rand in rands)
                 if funcmap == variadic_functions:
-                    return funcmap[rator](list(gen_params))
-                elif funcmap == lazy_functions:
                     return funcmap[rator](gen_params)
                 elif funcmap == binary_functions:
                     # TODO: make this an exception
                     assert(len(rands) == 2)
-                    return funcmap[rator](*gen_params)
-                elif funcmap == unary_functions:
-                    # TODO: make this an exception
-                    assert(len(rands) == 1)
                     return funcmap[rator](*gen_params)
 
     # CORE LANGUAGE
