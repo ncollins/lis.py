@@ -144,16 +144,14 @@ def eval_in_env(exp, env):
     else:
         # first element should be a variable pointing to a function
         # or a lambda expression
-        func = rator
-        closure = eval_in_env(func, env)
-        args = rands
-        args = [eval_in_env(a, env) for a in args]
+        closure = eval_in_env(rator, env)
+        rands = [eval_in_env(a, env) for a in rands]
         (_, f, closure_env) = closure
         (_, params, body) = f
-        if isinstance(func, str):
-            new_env = [(func, closure)] + list(zip(params, args)) + closure_env
+        if isinstance(rator, str):
+            new_env = [(rator, closure)] + list(zip(params, rands)) + closure_env
         else:
-            new_env = list(zip(params, args)) + closure_env
+            new_env = list(zip(params, rands)) + closure_env
         return eval_in_env(body, new_env)
 
 
