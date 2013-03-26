@@ -76,7 +76,7 @@ def lookup(name, env):
             return v
     raise Exception('unknown variable "{}"'.format(name))
 
-variatic_functions = {'+': sum,
+variadic_functions = {'+': sum,
                       '*': lambda li: reduce(operator.mul, li),
                       '-': lambda li: reduce(operator.sub, li),
                       '/': lambda li: reduce(operator.div, li),
@@ -107,8 +107,8 @@ def eval_in_env(exp, env):
     # FUNCTIONS
     rator, rands = exp[0], exp[1:]
     if not isinstance(rator, list):
-        if rator in variatic_functions:
-            return variatic_functions[rator]([eval_in_env(rand, env) for rand in rands])
+        if rator in variadic_functions:
+            return variadic_functions[rator]([eval_in_env(rand, env) for rand in rands])
         elif rator in binary_functions:
             x, y = rands
             return binary_functions[rator](eval_in_env(x, env), eval_in_env(y, env))
