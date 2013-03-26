@@ -120,11 +120,9 @@ def eval_in_env(exp, env):
         return any(eval_in_env(p,env) for p in rands)
     # CORE LANGUAGE
     elif rator == 'if':
-        (_, pred, exp_true, exp_false) = exp
-        if eval_in_env(pred, env):
-            return eval_in_env(exp_true, env)
-        else:
-            return eval_in_env(exp_false, env)
+        f = lambda (pred, exp_true, exp_false): eval_in_env(
+                exp_true if eval_in_env(pred,env) else exp_false, env)
+        return f(rands)
     elif rator == 'let':
         (_, pairs, e) = exp
         new_env = env
