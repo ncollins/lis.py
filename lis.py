@@ -76,26 +76,32 @@ def lookup(name, env):
             return v
     raise Exception('unknown variable "{}"'.format(name))
 
-variatic_functions = {'+': sum,
-                      '*': lambda li: reduce(operator.mul, li),
-                      '-': lambda li: reduce(operator.sub, li),
-                      '/': lambda li: reduce(operator.div, li),
-                      'list': lambda li: li,
-                      }
+function_map = {
+                      # variadic functions
+                      '+': sum,
+                      '*': lambda gen: reduce(operator.mul, gen),
+                      '-': lambda gen: reduce(operator.sub, gen),
+                      '/': lambda gen: reduce(operator.div, gen),
+                      'list': lambda gen: list(gen),
 
-binary_functions = {'<': operator.lt,
-                    '>': operator.gt,
-                    '=': operator.eq,
-                    '>=': operator.ge,
-                    '<=': operator.le,
-                    # todo: extend tests to cover le and ge
-                    'cons': lambda x, y: [x] + y,
+                      # short-circuiting functions
+                      'and': lambda gen: all(p for p in gen),
+                      'or':  lambda gen: any(p for p in gen),
+
+                      # binary functions
+                      'cons': lambda (x, y): [x] + y,
+                      '<': lambda (x, y): operator.lt(x, y),
+                      '>': lambda (x, y): operator.gt(x, y),
+                      '=': lambda (x, y): operator.eq(x, y),
+                      '>=': lambda (x, y): operator.ge(x, y),
+                      '<=': lambda (x, y): operator.le(x, y),
+
+
+                      # unary functions
+                      'car': lambda (li,): li[0],
+                      'cdr': lambda (li,): li[1:],
+                      'null?': lambda (li,): li == [],
                     }
-
-unary_functions = {'car': lambda li: li[0],
-                   'cdr': lambda li: li[1:],
-                   'null?': lambda x: x == [],
-                  }
 
 def eval_in_env(exp, env):
     if exp == 'null':
@@ -106,33 +112,17 @@ def eval_in_env(exp, env):
         return exp
     # FUNCTIONS
     rator, rands = exp[0], exp[1:]
-    if not isinstance(rator, list):
-        if rator in variatic_functions:
-            return variatic_functions[rator]([eval_in_env(rand, env) for rand in rands])
-        elif rator in binary_functions:
-            x, y = rands
-            return binary_functions[rator](eval_in_env(x, env), eval_in_env(y, env))
-        elif rator in unary_functions:
-            return unary_functions[rator](eval_in_env(rands[0], env))
-    if rator == 'and':
-        params = rands
-        for p in params:
-            if not eval_in_env(p, env):
-                return False
-        return True
-    elif rator == 'or':
-        params = rands
-        for p in params:
-            if eval_in_env(p, env):
-                return True
-        return False
+    if not isinstance(rator, list) and rator in function_map:
+        gen_params = (eval_in_env(rand, env) for rand in rands)
+        return function_map[rator](gen_params)
+
     # CORE LANGUAGE
-    elif rator == 'if':
-        (_, pred, exp_true, exp_false) = exp
+    if rator == 'if':
+        (pred, expr_true, expr_false) = rands
         if eval_in_env(pred, env):
-            return eval_in_env(exp_true, env)
+            return eval_in_env(expr_true, env)
         else:
-            return eval_in_env(exp_false, env)
+            return eval_in_env(expr_false, env)
     elif rator == 'let':
         (_, pairs, e) = exp
         new_env = env
@@ -154,16 +144,14 @@ def eval_in_env(exp, env):
     else:
         # first element should be a variable pointing to a function
         # or a lambda expression
-        func = rator
-        closure = eval_in_env(func, env)
-        args = rands
-        args = [eval_in_env(a, env) for a in args]
+        closure = eval_in_env(rator, env)
+        rands = [eval_in_env(a, env) for a in rands]
         (_, f, closure_env) = closure
         (_, params, body) = f
-        if isinstance(func, str):
-            new_env = [(func, closure)] + list(zip(params, args)) + closure_env
+        if isinstance(rator, str):
+            new_env = [(rator, closure)] + list(zip(params, rands)) + closure_env
         else:
-            new_env = list(zip(params, args)) + closure_env
+            new_env = list(zip(params, rands)) + closure_env
         return eval_in_env(body, new_env)
 
 
