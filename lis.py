@@ -115,17 +115,9 @@ def eval_in_env(exp, env):
         elif rator in unary_functions:
             return unary_functions[rator](eval_in_env(rands[0], env))
     if rator == 'and':
-        params = rands
-        for p in params:
-            if not eval_in_env(p, env):
-                return False
-        return True
+        return all(eval_in_env(p,env) for p in rands)
     elif rator == 'or':
-        params = rands
-        for p in params:
-            if eval_in_env(p, env):
-                return True
-        return False
+        return any(eval_in_env(p,env) for p in rands)
     # CORE LANGUAGE
     elif rator == 'if':
         (_, pred, exp_true, exp_false) = exp
