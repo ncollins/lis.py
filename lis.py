@@ -87,10 +87,6 @@ lazy_functions = {'and': lambda li: all(p for p in li),
                   'or':  lambda li: any(p for p in li),
                  }
 
-special_functions = { 'if': lambda (pred, exp_true, exp_false), env: eval_in_env(
-                          exp_true if eval_in_env(pred,env) else exp_false, env)
-                    }
-
 binary_functions = {'<': operator.lt,
                     '>': operator.gt,
                     '=': operator.eq,
@@ -115,7 +111,7 @@ def eval_in_env(exp, env):
     # FUNCTIONS
     rator, rands = exp[0], exp[1:]
     if not isinstance(rator, list):
-        for funcmap in [variadic_functions, lazy_functions, special_functions,
+        for funcmap in [variadic_functions, lazy_functions, 
                          binary_functions, unary_functions ]:
             if rator in funcmap:
                 gen_params = (eval_in_env(rand, env) for rand in rands)
@@ -123,8 +119,6 @@ def eval_in_env(exp, env):
                     return funcmap[rator](list(gen_params))
                 elif funcmap == lazy_functions:
                     return funcmap[rator](gen_params)
-                elif funcmap == special_functions:
-                    return funcmap[rator](rands, env)
                 elif funcmap == binary_functions:
                     # TODO: make this an exception
                     assert(len(rands) == 2)
@@ -135,7 +129,13 @@ def eval_in_env(exp, env):
                     return funcmap[rator](*gen_params)
 
     # CORE LANGUAGE
-    if rator == 'let':
+    if rator == 'if':
+        (pred, expr_true, expr_false) = rands
+        if eval_in_env(pred, env):
+            return eval_in_env(expr_true, env)
+        else:
+            return eval_in_env(expr_false, env)
+    elif rator == 'let':
         (_, pairs, e) = exp
         new_env = env
         for p in pairs:
