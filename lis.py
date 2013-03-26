@@ -76,26 +76,32 @@ def lookup(name, env):
             return v
     raise Exception('unknown variable "{}"'.format(name))
 
-variadic_functions = {'+': sum,
+function_map = {
+                      # variadic functions
+                      '+': sum,
                       '*': lambda gen: reduce(operator.mul, gen),
                       '-': lambda gen: reduce(operator.sub, gen),
                       '/': lambda gen: reduce(operator.div, gen),
                       'list': lambda gen: list(gen),
+
+                      # short-circuiting functions
                       'and': lambda gen: all(p for p in gen),
                       'or':  lambda gen: any(p for p in gen),
-                      'cons': lambda (x, y): [x] + y,
-                      'car': lambda gen: gen.next()[0],
-                      'cdr': lambda gen: gen.next()[1:],
-                      'null?': lambda gen: gen.next() == [],
-                    }
 
-binary_functions = {'<': operator.lt,
-                    '>': operator.gt,
-                    '=': operator.eq,
-                    '>=': operator.ge,
-                    '<=': operator.le,
-                    # todo: extend tests to cover le and ge
-                   }
+                      # binary functions
+                      'cons': lambda (x, y): [x] + y,
+                      '<': lambda (x, y): operator.lt(x, y),
+                      '>': lambda (x, y): operator.gt(x, y),
+                      '=': lambda (x, y): operator.eq(x, y),
+                      '>=': lambda (x, y): operator.ge(x, y),
+                      '<=': lambda (x, y): operator.le(x, y),
+
+
+                      # unary functions
+                      'car': lambda (li,): li[0],
+                      'cdr': lambda (li,): li[1:],
+                      'null?': lambda (li,): li == [],
+                    }
 
 def eval_in_env(exp, env):
     if exp == 'null':
@@ -106,16 +112,9 @@ def eval_in_env(exp, env):
         return exp
     # FUNCTIONS
     rator, rands = exp[0], exp[1:]
-    if not isinstance(rator, list):
-        for funcmap in [variadic_functions, binary_functions]:
-            if rator in funcmap:
-                gen_params = (eval_in_env(rand, env) for rand in rands)
-                if funcmap == variadic_functions:
-                    return funcmap[rator](gen_params)
-                elif funcmap == binary_functions:
-                    # TODO: make this an exception
-                    assert(len(rands) == 2)
-                    return funcmap[rator](*gen_params)
+    if not isinstance(rator, list) and rator in function_map:
+        gen_params = (eval_in_env(rand, env) for rand in rands)
+        return function_map[rator](gen_params)
 
     # CORE LANGUAGE
     if rator == 'if':
