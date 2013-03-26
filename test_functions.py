@@ -60,6 +60,13 @@ def test_and_false():
     exp = parse_tokens(tokenize(source))[0]
     assert eval_in_env(exp, []) == False
 
+def test_and_shortcircuit():
+    source = ['(and #f never-reached)']
+    exp = parse_tokens(tokenize(source))[0]
+    try:
+        eval_in_env(exp, [])
+    except Exception as e:
+        assert str(e) != 'unknown variable "never-reached"'
 
 def test_or_true():
     source = ['(or (> 2 10) (= 1 1) #f)']
@@ -71,3 +78,11 @@ def test_or_false():
     source = ['(or (> 2 10) (= 1 2) #f)']
     exp = parse_tokens(tokenize(source))[0]
     assert eval_in_env(exp, []) == False
+
+def test_or_shortcircuit():
+    source = ['(or #t never-reached)']
+    exp = parse_tokens(tokenize(source))[0]
+    try:
+        eval_in_env(exp, [])
+    except Exception as e:
+        assert str(e) != 'unknown variable "never-reached"'
