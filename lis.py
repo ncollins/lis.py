@@ -23,6 +23,19 @@ def tokenize(lines):
             for s in split_word(word):
                 yield s
 
+# ERRORS ===============================
+
+class LisError(Exception):
+    pass
+
+
+class LisSyntaxError(LisError):
+    pass
+
+
+class LisNameError(LisError):
+    pass
+
 
 # KEYWORDS and TYPE CONVERSION =========
 
