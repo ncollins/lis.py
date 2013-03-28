@@ -85,7 +85,7 @@ def lookup(name, env):
     for n, v in env:
         if n == name:
             return v
-    raise Exception('unknown variable "{}"'.format(name))
+    raise LisNameError('Unknown variable "{}"'.format(name))
 
 function_map = {
                       # variadic functions
@@ -106,7 +106,6 @@ function_map = {
                       '=': lambda (x, y): operator.eq(x, y),
                       '>=': lambda (x, y): operator.ge(x, y),
                       '<=': lambda (x, y): operator.le(x, y),
-
 
                       # unary functions
                       'car': lambda (li,): li[0],
@@ -190,6 +189,8 @@ def repl():
         except EOFError:
             print('\nLeaving lis.py.')
             break
+        except LisNameError as e:
+            print e
         except Exception as e:
             print e
             print('*** Invalid input ***')
