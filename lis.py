@@ -4,7 +4,7 @@ import operator
 try:
     from termcolor import colored
     COLOR = True
-except:
+except ImportError:
     COLOR = False
 
 
