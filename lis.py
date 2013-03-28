@@ -69,7 +69,7 @@ def atom(token):
 
 # PARSER ===============================
 
-def parse_tokens(tokens):
+def parse_tokens(tokens, parens=0):
     """
     Parsing function: this relies on tokens being a generator
     so that each token is only seen once.
@@ -82,11 +82,12 @@ def parse_tokens(tokens):
     out = []
     for t in tokens:
         if t == '(':
-            out.append(parse_tokens(tokens))
-        elif out == [] and t == ')':
+            lst, parens = parse_tokens(tokens, parens+1)
+            out.append(lst)
+        elif parens == 0 and t == ')':
             raise LisSyntaxError('Unexpected ")"')
         elif t == ')':
-            return out
+            return (out, parens - 1)
         else:
             out.append(atom(t))
     return out
