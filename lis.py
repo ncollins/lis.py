@@ -84,7 +84,7 @@ def parse_tokens(tokens):
         if t == '(':
             out.append(parse_tokens(tokens))
         elif out == [] and t == ')':
-            raise Exception('Unexpected ")"')
+            raise LisSyntaxError('Unexpected ")"')
         elif t == ')':
             return out
         else:
