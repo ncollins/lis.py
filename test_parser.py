@@ -1,5 +1,7 @@
+import pytest
 
 from lis import tokenize, parse_tokens
+from lis import LisError, LisSyntaxError, LisNameError
 
 def test_tokenize():
     source0 = ['(define a 3)']
@@ -9,8 +11,6 @@ def test_tokenize():
     assert list(tokens0) == ['(', 'define', 'a', '3', ')']
     assert list(tokens1) == ['(', '+', '10', '25', '0', ')']
 
-
-# get_list()
 
 def test_parse_define():
     source = ['(define a 3)']
@@ -38,3 +38,10 @@ def test_parse_define_lambda():
     tokens = tokenize(source)
     exp = parse_tokens(tokens)
     assert exp == [['define', 'add', ['lambda', ['x', 'y'], ['+', 'x', 'y']]]]
+
+
+def test_parse_unexpected_closing_paren():
+    source = ['(define add 3))']
+    tokens = tokenize(source)
+    with pytest.raises(LisSyntaxError) as e:
+        exp = parse_tokens(tokens)
