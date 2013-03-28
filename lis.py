@@ -30,16 +30,14 @@ def atom(token):
     # try to convert token to int or float
     try:
         return int(token)
+        return float(token)
     except ValueError:
-        try:
-            return float(token)
-        except ValueError:
-            if token == '#t':
-                return True
-            elif token == '#f':
-                return False
-            else:
-                return token
+        if token == '#t':
+            return True
+        elif token == '#f':
+            return False
+        else:
+            return token
 
 
 # PARSER ===============================
