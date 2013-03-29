@@ -175,8 +175,14 @@ def eval_in_env(exp, env):
     elif rator == 'set!':
         (_, name, e) = exp
         set_var(name, env, eval_in_env(e, env))
+    elif rator == 'begin':
+        out = None
+        for e in rands:
+            out = eval_in_env(e, env)
+        return out
     elif rator == 'display':
         print(eval_in_env(exp[1], env))
+
     # FUNCTION EVALUATION
     else:
         # first element should be a variable pointing to a function

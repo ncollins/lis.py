@@ -63,3 +63,8 @@ def test_eval_set():
     exp = ['set!', 'a', 10]
     eval_in_env(exp, env)
     assert lookup('a', env) == 10
+
+
+def test_eval_begin():
+    exp = ['begin', ['define', 'a', 0], ['set!', 'a', 10], 'a']
+    assert eval_in_env(exp, []) == 10
