@@ -102,6 +102,15 @@ def lookup(name, env):
             return v
     raise LisNameError('Unknown variable "{}"'.format(name))
 
+
+def set_var(name, env, val):
+    for i, (n, _) in enumerate(env):
+        if n == name:
+            env[i] = (name, val)
+            return
+    raise LisNameError('Unknown variable "{}"'.format(name))
+
+
 function_map = {
                       # variadic functions
                       '+': sum,
@@ -163,6 +172,9 @@ def eval_in_env(exp, env):
         # needs to return a closure
         #(_, params, body) = exp
         return ['closure', exp, list(env)] # ensure the env won't be mutated
+    elif rator == 'set!':
+        (_, name, e) = exp
+        set_var(name, env, eval_in_env(e, env))
     elif rator == 'display':
         print(eval_in_env(exp[1], env))
     # FUNCTION EVALUATION

@@ -1,5 +1,5 @@
 
-from lis import tokenize, parse_tokens, eval_in_env
+from lis import tokenize, parse_tokens, eval_in_env, lookup
 
 
 def test_eval_add_const():
@@ -56,3 +56,10 @@ def test_eval_recursion_2():
 def test_eval_anon():
     exp = [['lambda', ['x'], ['+', 'x', 'x']], 7]
     assert eval_in_env(exp, []) == 14
+
+
+def test_eval_set():
+    env = [('a', 0)]
+    exp = ['set!', 'a', 10]
+    eval_in_env(exp, env)
+    assert lookup('a', env) == 10
