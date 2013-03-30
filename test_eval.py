@@ -13,6 +13,16 @@ def test_eval_if():
     assert eval_in_env(exp, []) == 3
 
 
+def test_eval_cond_true():
+    exp = ['cond', [['>', 4, 3], 1], ['else', 0]]
+    assert eval_in_env(exp, []) == 1
+
+
+def test_eval_cond_false():
+    exp = ['cond', [['>', 4, 4], 1], ['else', 0]]
+    assert eval_in_env(exp, []) == 0
+
+
 def test_eval_let():
     exp = ['let', [['x', 3], ['y', 10]], ['+', 'x', 'y']]
     assert eval_in_env(exp, []) == 13

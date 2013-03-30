@@ -140,6 +140,8 @@ function_map = {
 def eval_in_env(exp, env):
     if exp == 'null':
         return []
+    if exp == 'else':
+        return True
     elif isinstance(exp, str):
         return lookup(exp, env)
     if not isinstance(exp, list):
@@ -157,6 +159,11 @@ def eval_in_env(exp, env):
             return eval_in_env(expr_true, env)
         else:
             return eval_in_env(expr_false, env)
+    if rator == 'cond':
+        for pred, exp in rands:
+            if eval_in_env(pred, env):
+                return eval_in_env(exp, env)
+        raise LisSyntaxError('cond statement without else branch')
     elif rator == 'let':
         (_, pairs, e) = exp
         new_env = env
