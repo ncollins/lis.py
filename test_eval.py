@@ -22,7 +22,7 @@ def test_eval_define():
     env = []
     exp = ['define', 'a', 3]
     eval_in_env(exp, env)
-    assert env == [('a', 3)]
+    assert env == [['a', 3]]
 
 
 def test_eval_closure():
@@ -59,7 +59,7 @@ def test_eval_anon():
 
 
 def test_eval_set():
-    env = [('a', 0)]
+    env = [['a', 0]]
     exp = ['set!', 'a', 10]
     eval_in_env(exp, env)
     assert lookup('a', env) == 10

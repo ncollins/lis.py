@@ -106,7 +106,7 @@ def lookup(name, env):
 def set_var(name, env, val):
     for i, (n, _) in enumerate(env):
         if n == name:
-            env[i] = (name, val)
+            env[i][1] = val
             return
     raise LisNameError('Unknown variable "{}"'.format(name))
 
@@ -162,15 +162,14 @@ def eval_in_env(exp, env):
         new_env = env
         for p in pairs:
             name, val = p[0], p[1]
-            new_env = [(name, eval_in_env(val, env))] + new_env
+            new_env = [[name, eval_in_env(val, env)]] + new_env
         return eval_in_env(e, new_env)
     elif rator == 'define':
         # just a simple mofification of the current env
         (_, name, e) = exp
-        env.insert(0, (name, eval_in_env(e, env)))
+        env.insert(0, [name, eval_in_env(e, env)])
     elif rator == 'lambda':
         # needs to return a closure
-        #(_, params, body) = exp
         return ['closure', exp, list(env)] # ensure the env won't be mutated
     elif rator == 'set!':
         (_, name, e) = exp
