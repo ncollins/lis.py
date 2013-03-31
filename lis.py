@@ -11,6 +11,13 @@ except ImportError:
 # COLOR PRINTING =======================
 
 def color_print(string, color='white'):
+    """
+    This wraps the standard Python print() function.
+    It uses colored output if the import of termcolor succeeded.
+    Parameters:
+        string - the string to be printed. 
+        color - a string representing a color, e.g. 'white', 'red', 'blue'.
+    """
     if COLOR:
         print(colored(string, color))
     else:
@@ -19,6 +26,11 @@ def color_print(string, color='white'):
 # LEXER ================================
 
 def split_word(word):
+    """
+    Takes a block of text with no whitespace and returns a generator
+    yielding the individual tokens. e.g. '(function)' would yield:
+        '(', 'fuction', ')'
+    """
     current = ''
     for c in word:
         if c == '(' or c == ')':
@@ -32,6 +44,10 @@ def split_word(word):
         yield current
 
 def tokenize(lines):
+    """
+    Takes an iterable of strings, for example the lines from a file,
+    and returns a generator yielding the individual tokens.
+    """
     for line in lines:
         for word in line.split():
             for s in split_word(word):
@@ -54,7 +70,12 @@ class LisNameError(LisError):
 # KEYWORDS and TYPE CONVERSION =========
 
 def atom(token):
-    # try to convert token to int or float
+    """
+    Takes a single token and tries in order:
+        (1) to convert to an int or float,
+        (2) to convert '#t' or '#f' into a boolean,
+    and returns the string if none of the above succeed.
+    """
     try:
         return int(token)
         return float(token)
