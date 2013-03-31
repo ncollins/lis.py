@@ -251,6 +251,8 @@ def repl():
             break
         except LisNameError as e:
             color_print(e, 'red')
+        except LisSyntaxError as e:
+            color_print(e, 'red')
         except Exception as e:
             color_print(e, 'red')
             print('*** Invalid input ***')
