@@ -211,6 +211,10 @@ def eval_in_env(exp, env):
         return out
     elif rator == 'display':
         sys.stdout.write(str(eval_in_env(exp[1], env)))
+    elif rator == 'write-line':
+        print(eval_in_env(exp[1], env))
+    elif rator == 'read-line':
+        return raw_input()
 
     # FUNCTION EVALUATION
     else:
