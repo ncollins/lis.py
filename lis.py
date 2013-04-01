@@ -1,6 +1,8 @@
 #! /usr/bin/env python
 import argparse
 import operator
+import sys
+
 try:
     from termcolor import colored
     COLOR = True
@@ -208,7 +210,7 @@ def eval_in_env(exp, env):
             out = eval_in_env(e, env)
         return out
     elif rator == 'display':
-        print(eval_in_env(exp[1], env))
+        sys.stdout.write(str(eval_in_env(exp[1], env)))
 
     # FUNCTION EVALUATION
     else:
