@@ -1,5 +1,6 @@
 
-from lis import tokenize, parse_tokens, eval_in_env
+from lexer import tokenize
+from lis import parse_tokens, eval_in_env
 
 def test_cons():
     source = ['(cons (+ 1 3 5) null)']

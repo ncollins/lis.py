@@ -1,6 +1,7 @@
 import pytest
 
-from lis import tokenize, parse_tokens
+from lexer import tokenize
+from lis import parse_tokens
 from liserrors import LisError, LisSyntaxError, LisNameError
 
 def test_tokenize():
