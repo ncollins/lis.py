@@ -1,21 +1,54 @@
 import sys
 import operator
 
+from errors import LisNameError
+
+# ENVIRONMENT
+
+class Environment(object):
+    def __init__(self, variables, parent=None):
+        if parent:
+            self._env = list(parent._env)
+        else:
+            self._env = []
+        for name, val in variables:
+            self.add(name, val)
+
+    def add(self, name, val):
+        if name in self._env:
+            raise LisNameError('duplicate definition for: {}'.format(name))
+        else:
+            self._env.insert(0, [name, val])
+
+    def set(self, name, val):
+        for i, (n, _) in enumerate(self._env):
+            if n == name:
+                self._env[i][1] = val
+                return
+        raise LisNameError('Unknown variable "{}"'.format(name))
+
+    def lookup(self, name):
+        for n, v in self._env:
+            if n == name:
+                return v
+        raise LisNameError('Unknown variable "{}"'.format(name))
+
+
 # EVALUATOR ============================
 
-def lookup(name, env):
-    for n, v in env:
-        if n == name:
-            return v
-    raise LisNameError('Unknown variable "{}"'.format(name))
+#def lookup(name, env):
+#    for n, v in env:
+#        if n == name:
+#            return v
+#    raise LisNameError('Unknown variable "{}"'.format(name))
 
 
-def set_var(name, env, val):
-    for i, (n, _) in enumerate(env):
-        if n == name:
-            env[i][1] = val
-            return
-    raise LisNameError('Unknown variable "{}"'.format(name))
+#def set_var(name, env, val):
+#    for i, (n, _) in enumerate(env):
+#        if n == name:
+#            env[i][1] = val
+#            return
+#    raise LisNameError('Unknown variable "{}"'.format(name))
 
 
 function_map = {
@@ -50,7 +83,7 @@ def eval_in_env(exp, env):
     if exp == 'else':
         return True
     elif isinstance(exp, str):
-        return lookup(exp, env)
+        return env.lookup(exp)
     if not isinstance(exp, list):
         return exp
     # FUNCTIONS
@@ -73,21 +106,23 @@ def eval_in_env(exp, env):
         raise LisSyntaxError('cond statement without else branch')
     elif rator == 'let':
         (_, pairs, e) = exp
-        new_env = env
-        for p in pairs:
-            name, val = p[0], p[1]
-            new_env = [[name, eval_in_env(val, env)]] + new_env
+        #new_env = env
+        #for p in pairs:
+        #    name, val = p[0], p[1]
+        #    new_env = Environment([[name, eval_in_env(val, env)]], env)
+        new_bindings = [[n, eval_in_env(v, env)] for n, v in pairs]
+        new_env = Environment(new_bindings, env)
         return eval_in_env(e, new_env)
     elif rator == 'define':
         # just a simple mofification of the current env
         (_, name, e) = exp
-        env.insert(0, [name, eval_in_env(e, env)])
+        env.add(name, eval_in_env(e, env))
     elif rator == 'lambda':
         # needs to return a closure
-        return ['closure', exp, list(env)] # ensure the env won't be mutated
+        return ['closure', exp, Environment([],env)] # ensure the env won't be mutated
     elif rator == 'set!':
         (_, name, e) = exp
-        set_var(name, env, eval_in_env(e, env))
+        env.set(name, eval_in_env(e, env))
     elif rator == 'begin':
         out = None
         for e in rands:
@@ -109,14 +144,14 @@ def eval_in_env(exp, env):
         (_, f, closure_env) = closure
         (_, params, body) = f
         if isinstance(rator, str):
-            new_env = [(rator, closure)] + list(zip(params, rands)) + closure_env
+            new_env = Environment([(rator, closure)] + list(zip(params, rands)),
+                                  closure_env)
         else:
-            new_env = list(zip(params, rands)) + closure_env
+            new_env = Environment(list(zip(params, rands)), closure_env)
         return eval_in_env(body, new_env)
 
 
 def eval_loop(program):
-    env = []
+    env = Environment([])
     for exp in program:
         eval_in_env(exp, env)
-

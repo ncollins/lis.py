@@ -10,7 +10,7 @@ except ImportError:
 from errors import LisError, LisSyntaxError, LisNameError
 from lex import tokenize
 from parse import parse_tokens
-from evaluate import eval_in_env, eval_loop
+from evaluate import eval_in_env, eval_loop, Environment
 
 
 # COLOR PRINTING =======================
@@ -36,12 +36,12 @@ def repl():
     color_print('lis.py - a simple Lisp written in Python', 'blue')
     color_print('(c) Nick Collins, 2013', 'blue')
     color_print('****************************************', 'blue')
-    env = []
+    env = Environment([])
     while True:
         try:
             user_input = raw_input('lis.py> ')
             exp = parse_tokens(tokenize([user_input]))[0]
-            tmp_env = env[:]
+            tmp_env = Environment([], env)
             color_print(eval_in_env(exp, tmp_env), 'green')
             env = tmp_env
         except EOFError:

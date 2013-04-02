@@ -1,24 +1,24 @@
 
 from lex import tokenize
 from parse import parse_tokens
-from evaluate import eval_in_env
+from evaluate import eval_in_env, Environment
 
 def test_cons():
     source = ['(cons (+ 1 3 5) null)']
     exp = parse_tokens(tokenize(source))[0]
-    assert eval_in_env(exp, []) == [9]
+    assert eval_in_env(exp, Environment([])) == [9]
 
 
 def test_cons_2():
     source = ['(cons (+ 1 3 5) (cons (+ 1 3 5) null))']
     exp = parse_tokens(tokenize(source))[0]
-    assert eval_in_env(exp, []) == [9, 9]
+    assert eval_in_env(exp, Environment([])) == [9, 9]
 
 
 def test_car():
     source = ['(car (cons 1 null))']
     exp = parse_tokens(tokenize(source))[0]
-    assert eval_in_env(exp, []) == 1
+    assert eval_in_env(exp, Environment([])) == 1
 
 
 def test_cdr():
