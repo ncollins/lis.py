@@ -1,7 +1,7 @@
 
-from lexer import tokenize
-from lisparser import parse_tokens
-from evaluator import eval_in_env, lookup
+from lex import tokenize
+from parse import parse_tokens
+from evaluate import eval_in_env, lookup
 
 
 def test_eval_add_const():

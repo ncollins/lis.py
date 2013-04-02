@@ -1,8 +1,8 @@
 import pytest
 
-from lexer import tokenize
-from lisparser import parse_tokens
-from liserrors import LisError, LisSyntaxError, LisNameError
+from lex import tokenize
+from parse import parse_tokens
+from errors import LisError, LisSyntaxError, LisNameError
 
 def test_tokenize():
     source0 = ['(define a 3)']

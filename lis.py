@@ -7,10 +7,10 @@ try:
 except ImportError:
     COLOR = False
 
-from liserrors import LisError, LisSyntaxError, LisNameError
-from lexer import tokenize
-from lisparser import parse_tokens
-from evaluator import eval_in_env, eval_loop
+from errors import LisError, LisSyntaxError, LisNameError
+from lex import tokenize
+from parse import parse_tokens
+from evaluate import eval_in_env, eval_loop
 
 
 # COLOR PRINTING =======================

@@ -1,5 +1,5 @@
 
-from liserrors import LisSyntaxError
+from errors import LisSyntaxError
 
 # KEYWORDS and TYPE CONVERSION =========
 
