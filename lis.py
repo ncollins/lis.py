@@ -9,6 +9,8 @@ try:
 except ImportError:
     COLOR = False
 
+from liserrors import LisError, LisSyntaxError, LisNameError
+
 
 # COLOR PRINTING =======================
 
@@ -54,19 +56,6 @@ def tokenize(lines):
         for word in line.split():
             for s in split_word(word):
                 yield s
-
-# ERRORS ===============================
-
-class LisError(Exception):
-    pass
-
-
-class LisSyntaxError(LisError):
-    pass
-
-
-class LisNameError(LisError):
-    pass
 
 
 # KEYWORDS and TYPE CONVERSION =========
