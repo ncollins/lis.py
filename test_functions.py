@@ -1,6 +1,7 @@
 
 from lexer import tokenize
-from lis import parse_tokens, eval_in_env
+from lisparser import parse_tokens
+from lis import eval_in_env
 
 def test_add():
     source = ['(+ 1 3 5)']
