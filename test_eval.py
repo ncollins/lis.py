@@ -34,7 +34,8 @@ def test_eval_define():
     env = Environment([])
     exp = ['define', 'a', 3]
     eval_in_env(exp, env)
-    assert env._env == [['a', 3]]
+    #assert env._env == [['a', 3]]
+    assert env.lookup('a') == 3
 
 
 def test_eval_closure():

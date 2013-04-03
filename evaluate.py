@@ -6,11 +6,14 @@ from errors import LisNameError
 # ENVIRONMENT
 
 class Environment(object):
+    """
+    Represents the environment of bound variables in the program.
+    Consists of a frame, represented by a dict, holding variables
+    and a reference to a parent frame.
+    """
     def __init__(self, variables, parent=None):
-        if parent:
-            self._env = list(parent._env)
-        else:
-            self._env = []
+        self._env = dict()
+        self._parent = parent
         for name, val in variables:
             self.add(name, val)
 
@@ -18,20 +21,22 @@ class Environment(object):
         if name in self._env:
             raise LisNameError('duplicate definition for: {}'.format(name))
         else:
-            self._env.insert(0, [name, val])
+            self._env[name] = val
 
     def set(self, name, val):
-        for i, (n, _) in enumerate(self._env):
-            if n == name:
-                self._env[i][1] = val
-                return
-        raise LisNameError('Unknown variable "{}"'.format(name))
+        if not name in self._env:
+            raise LisNameError('duplicate definition for: {}'.format(name))
+        else:
+            self._env[name] = val
 
     def lookup(self, name):
-        for n, v in self._env:
-            if n == name:
-                return v
-        raise LisNameError('Unknown variable "{}"'.format(name))
+        try:
+            return self._env[name]
+        except KeyError:
+            if self._parent:
+                return self._parent.lookup(name)
+            else:
+                raise LisNameError('Unknown variable "{}"'.format(name))
 
 
 # EVALUATOR ============================
