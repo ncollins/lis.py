@@ -75,11 +75,15 @@ function_map = {
                       '=': lambda (x, y): operator.eq(x, y),
                       '>=': lambda (x, y): operator.ge(x, y),
                       '<=': lambda (x, y): operator.le(x, y),
+                      'modulo': lambda (x,y): operator.mod(x, y),
 
                       # unary functions
                       'car': lambda (li,): li[0],
                       'cdr': lambda (li,): li[1:],
                       'null?': lambda (li,): li == [],
+                      'not': lambda (x,): (True if x == False
+                                            and isinstance(x, bool)
+                                            else False),
                     }
 
 def eval_in_env(exp, env):

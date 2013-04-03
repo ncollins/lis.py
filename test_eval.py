@@ -81,3 +81,15 @@ def test_eval_set():
 def test_eval_begin():
     exp = ['begin', ['define', 'a', 0], ['set!', 'a', 10], 'a']
     assert eval_in_env(exp, Environment([])) == 10
+
+
+def test_eval_modulo():
+    assert 0 == eval_in_env(['modulo', 9, 3], Environment([]))
+    assert 1 == eval_in_env(['modulo', 10, 3], Environment([]))
+    assert 2 == eval_in_env(['modulo', 11, 3], Environment([]))
+
+
+def test_eval_not():
+    assert True == eval_in_env(['not', False], Environment([]))
+    assert False == eval_in_env(['not', True], Environment([]))
+    assert False == eval_in_env(['not', 'null'], Environment([]))
