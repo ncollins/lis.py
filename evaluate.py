@@ -25,7 +25,10 @@ class Environment(object):
 
     def set(self, name, val):
         if not name in self._env:
-            raise LisNameError('cannot set undefined variable: {}'.format(name))
+            if self._parent:
+                self._parent.set(name, val)
+            else:
+                raise LisNameError('cannot set undefined variable: {}'.format(name))
         else:
             self._env[name] = val
 
