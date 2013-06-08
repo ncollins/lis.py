@@ -25,7 +25,7 @@ class Environment(object):
 
     def set(self, name, val):
         if not name in self._env:
-            raise LisNameError('duplicate definition for: {}'.format(name))
+            raise LisNameError('cannot set undefined variable: {}'.format(name))
         else:
             self._env[name] = val
 
